@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WishStar League ✦ 團隊夥伴平台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<!-- Stars background canvas -->
+<canvas id="starfield"></canvas>
+
+<!-- ============ LOGIN / REGISTER SCREEN ============ -->
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-container">
+    <div class="auth-logo">
+      <div class="logo-star">
+        <svg viewBox="0 0 80 80" width="80" height="80">
+          <defs>
+            <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#14B8A6"/>
+              <stop offset="100%" style="stop-color:#F97316"/>
+            </linearGradient>
+          </defs>
+          <polygon points="40,2 50,28 78,30 56,50 62,78 40,62 18,78 24,50 2,30 30,28" fill="url(#starGrad)" opacity="0.9"/>
+        </svg>
+      </div>
+      <h1 class="auth-title">WishStar League</h1>
+      <p class="auth-subtitle">團隊夥伴平台</p>
+    </div>
+
+    <!-- Login Form -->
+    <div id="login-form" class="auth-form active" data-lpignore="true">
+      <div class="form-group">
+        <label>帳號</label>
+        <input type="text" id="login-username" placeholder="請輸入帳號" autocomplete="off" data-lpignore="true">
+      </div>
+      <div class="form-group">
+        <label>密碼</label>
+        <input type="password" id="login-password" placeholder="請輸入密碼" autocomplete="off" data-lpignore="true">
+      </div>
+      <button class="btn btn-primary btn-full" onclick="handleLogin()">登入</button>
+      <div class="auth-links">
+        <a href="#" onclick="showRegister()">註冊新帳號</a>
+        <a href="#" onclick="showForgotPassword()">忘記密碼？</a>
+      </div>
+      <div id="login-error" class="error-msg"></div>
+    </div>
+
+    <!-- Register Form -->
+    <div id="register-form" class="auth-form">
+      <div class="form-group">
+        <label>姓名 <span class="required">*</span></label>
+        <input type="text" id="reg-name" placeholder="請輸入真實姓名">
+      </div>
+      <div class="form-group">
+        <label>帳號 <span class="required">*</span></label>
+        <input type="text" id="reg-username" placeholder="請設定帳號">
+      </div>
+      <div class="form-group">
+        <label>密碼 <span class="required">*</span></label>
+        <input type="password" id="reg-password" placeholder="請設定密碼" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label>手機 <span class="required">*</span></label>
+        <input type="tel" id="reg-phone" placeholder="請輸入手機號碼">
+      </div>
+      <div class="form-group">
+        <label>Email（選填）</label>
+        <input type="email" id="reg-email" placeholder="請輸入Email">
+      </div>
+      <div class="form-group">
+        <label>所屬團隊 <span class="required">*</span></label>
+        <select id="reg-team">
+          <option value="">請選擇團隊</option>
+        </select>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="handleRegister()">送出註冊</button>
+      <div class="auth-links">
+        <a href="#" onclick="showLogin()">返回登入</a>
+      </div>
+      <div id="register-error" class="error-msg"></div>
+      <div id="register-success" class="success-msg"></div>
+    </div>
+
+    <!-- Forgot Password Form -->
+    <div id="forgot-form" class="auth-form">
+      <p class="form-hint">請輸入註冊時的 Email，系統將協助您找回密碼。</p>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="forgot-email" placeholder="請輸入註冊Email">
+      </div>
+      <button class="btn btn-primary btn-full" onclick="handleForgotPassword()">找回密碼</button>
+      <div class="auth-links">
+        <a href="#" onclick="showLogin()">返回登入</a>
+      </div>
+      <div id="forgot-error" class="error-msg"></div>
+      <div id="forgot-success" class="success-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MAIN APP ============ -->
+<div id="app-screen" class="app-screen hidden">
+  <!-- Top Navigation -->
+  <header class="top-nav">
+    <div class="nav-left">
+      <button class="hamburger" onclick="toggleSidebar()" aria-label="選單">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-brand">
+        <svg viewBox="0 0 32 32" width="28" height="28">
+          <polygon points="16,1 20,11 31,12 23,20 25,31 16,25 7,31 9,20 1,12 12,11" fill="url(#starGrad)" opacity="0.9"/>
+        </svg>
+        <span>WishStar League</span>
+      </div>
+    </div>
+    <div class="nav-right">
+      <div class="nav-user" onclick="toggleUserMenu()">
+        <div class="user-avatar" id="nav-avatar">A</div>
+        <span id="nav-username">使用者</span>
+        <svg class="chevron" viewBox="0 0 20 20" width="16"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      </div>
+      <div id="user-dropdown" class="user-dropdown">
+        <a href="#" onclick="showProfile()">個人資料</a>
+        <a href="#" onclick="handleLogout()">登出</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar">
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <div class="sidebar-label">主選單</div>
+        <a href="#" class="sidebar-link active" data-page="home" onclick="navigateTo('home')">
+          <svg viewBox="0 0 24 24" width="20"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+          首頁
+        </a>
+        <a href="#" class="sidebar-link" data-page="articles" onclick="navigateTo('articles')">
+          <svg viewBox="0 0 24 24" width="20"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h10" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+          文章專區
+        </a>
+        <a href="#" class="sidebar-link" data-page="work-log" onclick="navigateTo('work-log')">
+          <svg viewBox="0 0 24 24" width="20"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+          工作紀錄
+        </a>
+      </div>
+
+      <!-- Admin / Leader sections -->
+      <div id="sidebar-admin" class="sidebar-section hidden">
+        <div class="sidebar-label">管理功能</div>
+        <a href="#" class="sidebar-link" data-page="pending" onclick="navigateTo('pending')">
+          <svg viewBox="0 0 24 24" width="20"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+          待審核夥伴
+          <span id="pending-badge" class="badge hidden">0</span>
+        </a>
+        <a href="#" class="sidebar-link" data-page="members" onclick="navigateTo('members')">
+          <svg viewBox="0 0 24 24" width="20"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+          夥伴管理
+        </a>
+        <a href="#" class="sidebar-link" data-page="all-logs" onclick="navigateTo('all-logs')">
+          <svg viewBox="0 0 24 24" width="20"><path d="M4 6h16M4 10h16M4 14h16M4 18h16" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+          全部工作紀錄
+        </a>
+        <a href="#" class="sidebar-link" data-page="publish" onclick="navigateTo('publish')">
+          <svg viewBox="0 0 24 24" width="20"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+          發佈文章
+        </a>
+      </div>
+
+      <div id="sidebar-team-mgmt" class="sidebar-section hidden">
+        <div class="sidebar-label">團隊管理</div>
+        <a href="#" class="sidebar-link" data-page="manage-teams" onclick="navigateTo('manage-teams')">
+          <svg viewBox="0 0 24 24" width="20"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+          團隊名稱管理
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Sidebar overlay for mobile -->
+  <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+  <!-- Main Content -->
+  <main id="main-content" class="main-content">
+    <!-- HOME PAGE -->
+    <div id="page-home" class="page active">
+      <div class="page-header">
+        <h2>歡迎回來，<span id="home-greeting"></span></h2>
+        <p class="page-desc">今天也是閃耀的一天</p>
+      </div>
+
+      <!-- Feedback notification -->
+      <div id="feedback-alert" class="feedback-alert hidden">
+        <svg viewBox="0 0 24 24" width="22"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+        <span>您有新的主管回饋，請查看工作紀錄！</span>
+        <a href="#" onclick="navigateTo('work-log')">前往查看</a>
+      </div>
+
+      <!-- Category quick cards -->
+      <div class="category-grid">
+        <div class="cat-card" onclick="filterArticlesByCategory('公告')">
+          <div class="cat-icon cat-announce">📢</div>
+          <h4>公告</h4>
+          <span id="count-announce" class="cat-count">0 篇</span>
+        </div>
+        <div class="cat-card" onclick="filterArticlesByCategory('工作要點')">
+          <div class="cat-icon cat-work">📋</div>
+          <h4>工作要點</h4>
+          <span id="count-work" class="cat-count">0 篇</span>
+        </div>
+        <div class="cat-card" onclick="filterArticlesByCategory('銷售技巧')">
+          <div class="cat-icon cat-sales">💡</div>
+          <h4>銷售技巧</h4>
+          <span id="count-sales" class="cat-count">0 篇</span>
+        </div>
+        <div class="cat-card" onclick="filterArticlesByCategory('商品訊息')">
+          <div class="cat-icon cat-product">🛍️</div>
+          <h4>商品訊息</h4>
+          <span id="count-product" class="cat-count">0 篇</span>
+        </div>
+        <div class="cat-card" onclick="filterArticlesByCategory('教育訓練')">
+          <div class="cat-icon cat-training">🎓</div>
+          <h4>教育訓練</h4>
+          <span id="count-training" class="cat-count">0 篇</span>
+        </div>
+      </div>
+
+      <!-- Latest articles -->
+      <div class="section-box">
+        <div class="section-header">
+          <h3>最新文章</h3>
+          <a href="#" class="view-all" onclick="navigateTo('articles')">查看全部 →</a>
+        </div>
+        <div id="home-articles" class="article-list"></div>
+      </div>
+
+      <!-- My work log summary -->
+      <div class="section-box">
+        <div class="section-header">
+          <h3>我的工作紀錄</h3>
+          <a href="#" class="view-all" onclick="navigateTo('work-log')">查看全部 →</a>
+        </div>
+        <div id="home-worklogs" class="worklog-summary"></div>
+      </div>
+    </div>
+
+    <!-- ARTICLES PAGE -->
+    <div id="page-articles" class="page">
+      <div class="page-header">
+        <h2>文章專區</h2>
+      </div>
+      <div class="articles-toolbar">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" width="18"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.5"/></svg>
+          <input type="text" id="article-search" placeholder="搜尋文章..." oninput="filterArticles()">
+        </div>
+        <div class="tag-filters">
+          <button class="tag-btn active" data-tag="all" onclick="setArticleTag('all')">全部</button>
+          <button class="tag-btn" data-tag="公告" onclick="setArticleTag('公告')">公告</button>
+          <button class="tag-btn" data-tag="工作要點" onclick="setArticleTag('工作要點')">工作要點</button>
+          <button class="tag-btn" data-tag="銷售技巧" onclick="setArticleTag('銷售技巧')">銷售技巧</button>
+          <button class="tag-btn" data-tag="商品訊息" onclick="setArticleTag('商品訊息')">商品訊息</button>
+          <button class="tag-btn" data-tag="教育訓練" onclick="setArticleTag('教育訓練')">教育訓練</button>
+        </div>
+      </div>
+      <div id="articles-list" class="article-list"></div>
+    </div>
+
+    <!-- WORK LOG PAGE -->
+    <div id="page-work-log" class="page">
+      <div class="page-header">
+        <h2>工作紀錄</h2>
+      </div>
+      <!-- New work log form (for partners) -->
+      <div id="worklog-form-section" class="section-box">
+        <h3>新增工作紀錄</h3>
+        <div class="form-group">
+          <label>日期</label>
+          <input type="date" id="wl-date">
+        </div>
+        <div class="form-group">
+          <label>工作內容</label>
+          <textarea id="wl-content" rows="4" placeholder="請描述今天的工作內容..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>留言 / 備註</label>
+          <textarea id="wl-note" rows="2" placeholder="有什麼想分享的嗎？"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="submitWorkLog()">送出紀錄</button>
+      </div>
+      <!-- Work log list -->
+      <div class="section-box">
+        <h3>我的紀錄</h3>
+        <div id="my-worklogs"></div>
+      </div>
+    </div>
+
+    <!-- PENDING APPROVAL PAGE -->
+    <div id="page-pending" class="page">
+      <div class="page-header">
+        <h2>待審核夥伴</h2>
+      </div>
+      <div id="pending-list" class="member-list"></div>
+    </div>
+
+    <!-- MEMBERS PAGE -->
+    <div id="page-members" class="page">
+      <div class="page-header">
+        <h2>夥伴管理</h2>
+      </div>
+      <div class="form-group" style="max-width:320px;">
+        <label>選擇團隊</label>
+        <select id="member-team-filter" onchange="filterMembers()">
+          <option value="all">全部團隊</option>
+        </select>
+      </div>
+      <div id="members-list" class="member-list"></div>
+    </div>
+
+    <!-- ALL WORK LOGS PAGE (admin/leader) -->
+    <div id="page-all-logs" class="page">
+      <div class="page-header">
+        <h2>全部工作紀錄</h2>
+      </div>
+      <div class="form-group" style="max-width:320px;">
+        <label>篩選團隊</label>
+        <select id="log-team-filter" onchange="filterAllLogs()">
+          <option value="all">全部團隊</option>
+        </select>
+      </div>
+      <div id="all-logs-list"></div>
+    </div>
+
+    <!-- PUBLISH ARTICLE PAGE -->
+    <div id="page-publish" class="page">
+      <div class="page-header">
+        <h2>發佈文章</h2>
+      </div>
+      <div class="section-box">
+        <div class="form-group">
+          <label>標題</label>
+          <input type="text" id="pub-title" placeholder="文章標題">
+        </div>
+        <div class="form-group">
+          <label>分類</label>
+          <select id="pub-category">
+            <option value="公告">公告</option>
+            <option value="工作要點">工作要點</option>
+            <option value="銷售技巧">銷售技巧</option>
+            <option value="商品訊息">商品訊息</option>
+            <option value="教育訓練">教育訓練</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>發佈對象</label>
+          <select id="pub-target">
+            <option value="all">所有人</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>內容</label>
+          <textarea id="pub-content" rows="8" placeholder="請輸入文章內容..."></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="publishArticle()">發佈</button>
+      </div>
+      <!-- My published articles -->
+      <div class="section-box" style="margin-top:1.5rem;">
+        <h3 id="my-articles-title">已發佈文章</h3>
+        <div id="my-articles"></div>
+      </div>
+    </div>
+
+    <!-- MANAGE TEAMS PAGE -->
+    <div id="page-manage-teams" class="page">
+      <div class="page-header">
+        <h2>團隊名稱管理</h2>
+      </div>
+      <div class="section-box">
+        <div class="form-row">
+          <input type="text" id="new-team-name" placeholder="輸入新團隊名稱" class="flex-grow">
+          <button class="btn btn-primary" onclick="addTeam()">新增團隊</button>
+        </div>
+        <div id="teams-list" style="margin-top:1rem;"></div>
+      </div>
+    </div>
+
+    <!-- PROFILE PAGE -->
+    <div id="page-profile" class="page">
+      <div class="page-header">
+        <h2>個人資料</h2>
+      </div>
+      <div class="section-box" id="profile-content"></div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
